@@ -1,4 +1,4 @@
-import { startAddExpense, addExpense, removeExpense, editExpense, setExpenses, startSetExpenses, startRemoveExpense } from '../../actions/expenses';
+import { startAddExpense, addExpense, removeExpense, editExpense, setExpenses, startSetExpenses, startRemoveExpense, startEditExpense } from '../../actions/expenses';
 import expenses from '../fixtures/expenses';
 import uuid from 'uuid';
 import configureMockStore from 'redux-mock-store';
@@ -9,7 +9,7 @@ const createMockStore = configureMockStore([thunk]);
 
 beforeEach((done) => {
     const expensesData = {}
-    expenses.forEach(({ id, description, note, amount, createdAt}) => {
+    expenses.forEach(({ id, description, note, amount, createdAt }) => {
         expensesData[id] = { description, note, amount, createdAt }
     });
     database.ref('expenses').set(expensesData).then(() => done())
@@ -50,6 +50,9 @@ test(('should setup edit expense action object'), () => {
         }
     })
 })
+
+
+
 
 /* test(('should setup add expense action object with defaults'), () => {
     const action = addExpense()
@@ -109,10 +112,10 @@ test('should add expense with defaults to database and store', (done) => {
     const store = createMockStore({});
 
     const defaultObj = {
-                description: '',
-                amount: 0,
-                note: '',
-                createdAt: 0
+        description: '',
+        amount: 0,
+        note: '',
+        createdAt: 0
     }
 
     store.dispatch(startAddExpense({})).then(() => {
@@ -121,8 +124,8 @@ test('should add expense with defaults to database and store', (done) => {
         expect(actions[0]).toEqual({
             type: 'ADD_EXPENSE',
             expense: {
-            id: expect.any(String),
-            ...defaultObj
+                id: expect.any(String),
+                ...defaultObj
             }
         });
 
@@ -153,3 +156,32 @@ test('should fetch the expenses from firebase', (done) => {
         done();
     })
 })
+
+test('should edit expenses from firebase', () => {
+    const store = createMockStore({})
+    const id = expenses[2].id
+    const updates = {
+        description: 'Coding Course',
+        amount: '1200'
+    }
+    store.dispatch(startEditExpense(id, updates)).then((done) => {
+        const action = store.getActions()
+        console.log(action)
+        expect(action[0]).toEqual({
+            "type": "EDIT_EXPENSE",
+            id,
+            updates
+        })
+        return database.ref(`expenses/${id}`).once('value')
+        }).then((snapshot) => {
+        expect(snapshot.val()).toEqual({
+            "amount": "1200",
+            "createdAt": 345600000,
+            "description": "Coding Course",
+            note: ''
+        });
+        done();
+    })
+
+})
+
