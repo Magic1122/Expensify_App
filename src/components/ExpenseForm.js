@@ -70,18 +70,20 @@ class ExpenseForm extends React.Component {
 
 
     render() {
-        return (<div>
-            {this.state.error && <p1>{this.state.error}</p1>}
-            <form onSubmit={this.onSubmit}>
+        return (
+            <form className='form' onSubmit={this.onSubmit}>
+            {this.state.error && <p1 className='form__error'>{this.state.error}</p1>}
                 <input type='text'
                     placeholder='Description'
                     autoFocus
+                    className='text-input'
                     value={this.state.description}
                     onChange={(e) => this.onDescriptionChange(e)}>
                 </input>
                 <input type='text'
                     placeholder='Amount'
                     value={this.state.amount}
+                    className='text-input'
                     onChange={this.onAmountChange}></input>
                 <SingleDatePicker
                     date={this.state.createdAt} // momentPropTypes.momentObj or null
@@ -93,11 +95,14 @@ class ExpenseForm extends React.Component {
                 />
                 <textarea
                     placeholder='Add a note for your expense (optional)'
+                    className='textarea'
                     value={this.state.note}
                     onChange={(e) => this.onNoteChange(e)}></textarea>
-                <button type='submit'>Add Expense</button>
+                <div>
+                <button className='button' type='submit'>Save Expense</button>
+                </div>
             </form>
-        </div>)
+        )
     }
 }
 
